@@ -65,12 +65,15 @@ TrajectoryEvaluator::TrajectoryEvaluator(
     stop_point = planning_target.stop_point().s();
   }
   for (const auto& lon_trajectory : lon_trajectories) {
+
+    // Ym: trajectory end point check, compare with stop point
     double lon_end_s = lon_trajectory->Evaluate(0, end_time);
     if (init_s[0] < stop_point &&
         lon_end_s + FLAGS_lattice_stop_buffer > stop_point) {
       continue;
     }
 
+    // Ym: lon. path v, a, jerk check wether on range
     if (!ConstraintChecker1d::IsValidLongitudinalTrajectory(*lon_trajectory)) {
       continue;
     }

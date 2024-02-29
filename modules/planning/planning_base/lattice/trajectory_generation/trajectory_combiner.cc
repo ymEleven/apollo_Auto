@@ -81,6 +81,10 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
     const double rkappa = matched_ref_point.kappa();
     const double rdkappa = matched_ref_point.dkappa();
 
+    // Ym: why there is rs but not s?
+    // maybe because of reference line is discretized, and s that the match point 
+    // to path returned is adapting? But s_dot why not is the same method? .....
+    // maybe there is consider on Cartesian <--> Frenet transfer problem
     std::array<double, 3> s_conditions = {rs, s_dot, s_ddot};
     std::array<double, 3> d_conditions = {d, d_prime, d_pprime};
     CartesianFrenetConverter::frenet_to_cartesian(

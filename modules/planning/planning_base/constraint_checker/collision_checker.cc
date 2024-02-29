@@ -100,6 +100,7 @@ bool CollisionChecker::InCollision(
         ego_theta, ego_length, ego_width);
     double shift_distance =
         ego_length / 2.0 - vehicle_config.vehicle_param().back_edge_to_center();
+    // Ym: shift to ego center?
     Vec2d shift_vec{shift_distance * std::cos(ego_theta),
                     shift_distance * std::sin(ego_theta)};
     ego_box.Shift(shift_vec);
@@ -127,6 +128,8 @@ void CollisionChecker::BuildPredictedEnvironment(
     if (obstacle->IsVirtual()) {
       continue;
     }
+    // Ym: if ego vehicle in lane, check object behind start s OR object have on path time graph (TS)
+    // 
     if (ego_vehicle_in_lane &&
         (IsObstacleBehindEgoVehicle(obstacle, ego_vehicle_s,
                                     discretized_reference_line) ||
@@ -134,6 +137,9 @@ void CollisionChecker::BuildPredictedEnvironment(
       continue;
     }
 
+    // Ym: if ego vehicle not in lane, all object will be considered;
+    // otherwise, the object that not behind ego vehicle start position 
+    //            & not in TS graph will be considered
     obstacles_considered.push_back(obstacle);
   }
 
@@ -145,6 +151,8 @@ void CollisionChecker::BuildPredictedEnvironment(
       // Obstacle::GetPointAtTime has handled this case.
       TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
       Box2d box = obstacle->GetBoundingBox(point);
+      // Ym: object length extend 2.0 * FLAGS_lon_collision_buffer = 4
+      //            width extend 2.0 * FLAGS_lat_collision_buffer = 0.2
       box.LongitudinalExtend(2.0 * FLAGS_lon_collision_buffer);
       box.LateralExtend(2.0 * FLAGS_lat_collision_buffer);
       predicted_env.push_back(std::move(box));
